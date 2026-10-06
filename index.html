@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compound Timer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="timer-card" aria-labelledby="timer-title">
+        <p class="eyebrow">Mobility routine</p>
+        <h1 id="timer-title">Compound timer</h1>
+
+        <div class="workout-picker" role="group" aria-label="Choose workout">
+          <button id="wake-up-button" class="workout-button selected" type="button">Wake up</button>
+          <button id="bedtime-button" class="workout-button" type="button">Bedtime</button>
+        </div>
+
+        <div class="timer-display" aria-live="polite">
+          <p id="phase-label" class="phase-label">Ready</p>
+          <output id="time-remaining" class="time-remaining" aria-label="Time remaining">00:00</output>
+          <p id="side-indicator" class="side-indicator" hidden></p>
+          <p id="detail-label" class="detail-label">Choose a workout and press start</p>
+        </div>
+
+        <div class="progress-copy">
+          <span id="exercise-progress">Exercise 1 of 8</span>
+          <span id="rep-progress">Ready</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <span id="progress-bar"></span>
+        </div>
+
+        <div class="controls" aria-label="Timer controls">
+          <button id="start-button" class="primary" type="button">Start</button>
+          <button id="reset-button" class="neutral" type="button">Reset</button>
+          <button id="skip-button" class="secondary" type="button">Skip</button>
+        </div>
+        <fieldset class="sound-settings">
+          <legend>Sound</legend>
+          <label class="mute-control">
+            <input id="mute-button" type="checkbox" />
+            Mute sounds
+          </label>
+          <label class="volume-control" for="volume-slider">
+            <span>Volume</span>
+            <input id="volume-slider" type="range" min="0" max="100" step="1" value="60" />
+            <output id="volume-value" for="volume-slider">60%</output>
+          </label>
+        </fieldset>
+        <p class="keyboard-hint">Space: start/pause · R: reset · S: skip</p>
+        <details class="overview">
+          <summary>Workout overview</summary>
+          <div id="overview-list"></div>
+        </details>
+        <section id="completion-summary" class="completion-summary" hidden aria-live="polite">
+          <h2>Workout complete</h2>
+          <p id="summary-text"></p>
+          <button id="summary-restart-button" class="primary" type="button">Start again</button>
+        </section>
+      </section>
+    </main>
+    <dialog id="switch-dialog" class="switch-dialog">
+      <form method="dialog">
+        <h2>Change workout?</h2>
+        <p>Your current timer progress will be lost and the selected workout will start from the beginning.</p>
+        <div class="dialog-actions">
+          <button id="cancel-switch-button" class="neutral" value="cancel" type="submit">Cancel</button>
+          <button id="confirm-switch-button" class="primary" value="confirm" type="submit">Change workout</button>
+        </div>
+      </form>
+    </dialog>
+    <script src="script.js"></script>
+  </body>
+</html>
