@@ -5,7 +5,7 @@ const workouts = {
     { reps: 10, seconds: 10, repRest: 3 },
     { reps: 20, seconds: 15, repRest: 5, alternating: true },
     { reps: 20, seconds: 15, repRest: 5, alternating: true },
-    { reps: 10, seconds: 30, repRest: 10, alternating: true },
+    { reps: 10, seconds: 30, repRest: 10, splitSides: true },
     { reps: 5, seconds: 30, repRest: 5 },
     { reps: 10, seconds: 7, repRest: 3 },
   ],
@@ -16,7 +16,7 @@ const workouts = {
     { reps: 10, seconds: 10, repRest: 3 },
     { reps: 20, seconds: 15, repRest: 5, alternating: true },
     { reps: 20, seconds: 15, repRest: 5, alternating: true },
-    { reps: 10, seconds: 30, repRest: 10, alternating: true },
+    { reps: 10, seconds: 30, repRest: 10, splitSides: true },
     { reps: 5, seconds: 30, repRest: 5 },
   ],
 };
@@ -79,7 +79,11 @@ function saveState() {
 
 function renderOverview() {
   overviewList.innerHTML = workouts[workoutName].map((exercise, index) => {
-    const side = exercise.alternating ? " · alternating sides" : "";
+    const side = exercise.alternating
+      ? " · alternating sides"
+      : exercise.splitSides
+        ? " · left then right"
+        : "";
     return `<div class="overview-item"><strong>Exercise ${index + 1}${side}</strong><span>${exercise.reps} × ${exercise.seconds}s</span></div>`;
   }).join("");
 }
@@ -147,6 +151,12 @@ function currentExercise() {
   return workouts[workoutName][exerciseIndex];
 }
 
+function sideForExercise(exercise, index) {
+  if (exercise.alternating) return index % 2 === 0 ? "Left" : "Right";
+  if (exercise.splitSides) return index < exercise.reps / 2 ? "Left" : "Right";
+  return "";
+}
+
 function formatTime(seconds) {
   return `00:${String(Math.max(0, seconds)).padStart(2, "0")}`;
 }
@@ -160,7 +170,7 @@ function phaseName() {
 function phaseDetail() {
   const exercise = currentExercise();
   if (phase === "work") {
-    const side = exercise.alternating ? (repIndex % 2 === 0 ? "Left" : "Right") : "";
+    const side = sideForExercise(exercise, repIndex);
     return `Exercise ${exerciseIndex + 1}${side ? ` · ${side}` : ""}`;
   }
   if (phase === "repRest") return `Next rep · Exercise ${exerciseIndex + 1}`;
@@ -183,7 +193,7 @@ function updateDisplay() {
   phaseLabel.classList.toggle("rest", phase !== "work");
   timeRemaining.textContent = phase === "complete" ? "Done" : formatTime(remaining);
   detailLabel.textContent = phase === "complete" ? `${workoutName === "wakeUp" ? "Wake up" : "Bedtime"} workout finished` : phaseDetail();
-  const side = phase === "work" && exercise.alternating ? (repIndex % 2 === 0 ? "Left" : "Right") : "";
+  const side = phase === "work" ? sideForExercise(exercise, repIndex) : "";
   sideIndicator.hidden = !side;
   sideIndicator.textContent = side;
   exerciseProgress.textContent = `Exercise ${Math.min(exerciseIndex + 1, 8)} of 8`;
@@ -220,7 +230,7 @@ function advancePhase(startAt = Date.now()) {
       finishWorkout();
     }
   } else if (phase === "repRest") {
-    playCue(exercise.alternating ? "sideChange" : "repStart");
+    playCue(exercise.alternating || exercise.splitSides ? "sideChange" : "repStart");
     setPhase("work", exercise.seconds, startAt);
   } else {
     exerciseIndex += 1;
